@@ -157,6 +157,33 @@
 #app .tds{max-width:160px;white-space:pre-wrap;font-size:9px;line-height:1.3}
 #app .tdn{max-width:180px;font-size:9px;line-height:1.3}
 #app .tdsk{max-width:130px;font-size:9px}
+/* Latest note badge in projects table */
+#app .note-badge{display:inline-block;background:#0672CB;color:#FFF;font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px}
+/* Daily Notes Cards */
+#app .dn-view-toggle{display:flex;gap:4px;margin-left:auto}
+#app .dn-view-toggle .vt-btn{padding:4px 10px;font-size:9px;font-weight:600;border:1.5px solid #D2D2D2;background:#F0F0F0;color:#40586D;cursor:pointer;border-radius:4px;font-family:Arial,sans-serif}
+#app .dn-view-toggle .vt-btn.active{background:#0672CB;color:#FFF;border-color:#0672CB}
+#app .dn-cards{display:grid;grid-template-columns:1fr;gap:14px}
+#app .dn-card{background:#FFF;border:1.5px solid #C5D4E3;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+#app .dn-card-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f9fbfd;border-bottom:1px solid #C5D4E3}
+#app .dn-card-header .dn-proj-name{font-size:13px;font-weight:700;color:#0D2155;flex:1}
+#app .dn-card-header .dn-proj-meta{font-size:9px;color:#40586D}
+#app .dn-card-header .dn-count{background:#0672CB;color:#FFF;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px}
+#app .dn-card-body{padding:0}
+#app .dn-entry{display:flex;gap:12px;padding:10px 16px;border-bottom:1px solid #F0F0F0;align-items:flex-start}
+#app .dn-entry:last-child{border-bottom:none}
+#app .dn-entry:hover{background:#f5f9fd}
+#app .dn-entry .dn-date{min-width:80px;font-size:10px;font-weight:700;color:#0672CB;padding-top:1px}
+#app .dn-entry .dn-text{flex:1;font-size:11px;color:#1D2C3B;line-height:1.5;white-space:pre-wrap}
+#app .dn-entry .dn-edit{flex-shrink:0}
+#app .dn-entry .dn-dot{width:8px;height:8px;border-radius:50%;background:#0672CB;margin-top:5px;flex-shrink:0}
+#app .dn-entry:first-child .dn-dot{background:#0B7C84;width:10px;height:10px;margin-top:4px}
+/* Timeline connector line */
+#app .dn-timeline{position:relative;padding-left:20px}
+#app .dn-timeline::before{content:'';position:absolute;left:19px;top:14px;bottom:14px;width:2px;background:#C5D4E3}
+#app .dn-timeline .dn-entry{position:relative;padding-left:20px}
+#app .dn-timeline .dn-dot{position:absolute;left:-6px;z-index:1}
+/* End cards */
 #app .tlw{overflow-x:auto;padding:4px 0}
 #app .tlr{display:flex;align-items:center;height:28px;margin-bottom:2px}
 #app .tll{width:160px;min-width:160px;font-size:9px;font-weight:600;padding-right:5px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -187,7 +214,6 @@
 <div class="ibox" id="initBox">
   <h2>📋 Dell Project Tracker</h2>
   <p class="sub">Select your Excel file. The dashboard will read it and live-sync all changes back to the <b>same file</b>.</p>
-
   <div class="file-area" id="fileArea">
     <div class="fa-icon" id="faIcon">📂</div>
     <div class="fa-text" id="faText"><b>Click here</b> to browse and select your Excel file</div>
@@ -196,31 +222,14 @@
     <div class="fa-change" id="faChange" style="display:none">Click to change file</div>
     <div class="fa-hint">Accepts .xlsx or .xls</div>
   </div>
-
-  <div class="note-box">
-    <b>⚠️ Important:</b> When you click above, your browser will ask for permission to <b>edit</b> the file. You must click <b>"Edit"</b> or <b>"Allow"</b> when prompted. This grants the dashboard permission to write changes directly back to the same file. <b>Use Chrome or Edge</b> for this feature.
-  </div>
-
-  <div class="opt-row">
-    <label>Live-Sync Interval:</label>
-    <select id="syncInterval">
-      <option value="5">Every 5 seconds</option>
-      <option value="10">Every 10 seconds</option>
-      <option value="15" selected>Every 15 seconds</option>
-    </select>
-  </div>
-
+  <div class="note-box"><b>⚠️ Important:</b> Your browser will ask permission to <b>edit</b> the file. Click <b>"Allow"</b>. Use <b>Chrome or Edge</b>.</div>
+  <div class="opt-row"><label>Live-Sync:</label><select id="syncInterval"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15" selected>15 seconds</option></select></div>
   <div class="btn-row">
     <button class="btn bg2" id="okBtn" disabled style="padding:10px 40px;font-size:13px;opacity:.5">OK — Load &amp; Connect</button>
     <button class="btn bs" style="font-size:12px;padding:8px 20px" id="skipBtn">Start Empty</button>
   </div>
-
   <div class="stm info" id="initSt"></div>
-
-  <div class="template-row">
-    <p>Starting fresh? Download the blank template:</p>
-    <button class="btn bs bsm" id="tmplBtn">📄 Download Template (.xlsx)</button>
-  </div>
+  <div class="template-row"><p>Starting fresh?</p><button class="btn bs bsm" id="tmplBtn">📄 Download Template</button></div>
 </div>
 </div>
 
@@ -262,6 +271,8 @@
 <div class="mbg" id="xBg"><div class="mdl ebox" id="xBox"></div></div>
 
 <div class="tabs" id="tabBar"></div>
+
+<!-- Add -->
 <div class="tc active" id="t-add">
 <form id="pF" novalidate><div class="fg">
 <div class="sh">Identity</div>
@@ -292,20 +303,42 @@
 <div class="brr"><button type="button" class="btn bs" id="clrFBtn">Clear</button><button type="submit" class="btn bp">Add Project</button></div>
 </div></form></div>
 
+<!-- Projects -->
 <div class="tc" id="t-prj">
 <div class="fb"><div class="ff"><label>Domain</label><select id="pD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>Status</label><select id="pS"><option value="All">All</option><option>Projected</option><option>WIP</option><option>On Hold</option><option>Submitted for Review</option><option>Fixes in Process</option><option>Approved by Dell</option><option>Scorm Published</option></select></div><div class="ff"><label>RAG</label><select id="pR"><option value="All">All</option><option>Red</option><option>Amber</option><option>Green</option></select></div><div class="ff"><label>Type</label><select id="pTy"><option value="All">All</option><option>Custom</option><option>New</option><option>Maintenance</option></select></div><button class="btn bs bsm" id="rPFBtn">Reset</button></div>
-<div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Type</th><th>Status</th><th>RAG</th><th>KO</th><th>Planned</th><th>Skills</th><th>Scope</th><th>Notes</th><th style="width:60px">Actions</th></tr></thead><tbody id="pB"></tbody></table></div>
+<div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Type</th><th>Status</th><th>RAG</th><th>KO</th><th>Planned</th><th>Skills</th><th>Scope</th><th>Latest Note</th><th style="width:60px">Actions</th></tr></thead><tbody id="pB"></tbody></table></div>
 <div class="empty" id="pE"><div class="ei">📁</div>No projects.</div>
 <div class="cr"><div class="cb"><h3>By Type</h3><canvas id="cTy"></canvas></div><div class="cb"><h3>Skills Radar</h3><canvas id="cSk"></canvas></div><div class="cb"><h3>Domain</h3><canvas id="cDo"></canvas></div><div class="cb"><h3>Status</h3><canvas id="cSt"></canvas></div></div></div>
 
+<!-- Scope -->
 <div class="tc" id="t-scp"><div class="fb"><div class="ff"><label>Domain</label><select id="sD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>Type</label><select id="sTy"><option value="All">All</option><option>Custom</option><option>New</option><option>Maintenance</option></select></div><button class="btn bs bsm" id="rSFBtn">Reset</button></div><div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Type</th><th>Status</th><th>Scope</th><th>Edit</th></tr></thead><tbody id="sB"></tbody></table></div><div class="empty" id="sE"><div class="ei">📝</div>No projects.</div></div>
 
-<div class="tc" id="t-nts"><div class="fb"><div class="ff"><label>Domain</label><select id="nD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>Project</label><select id="nP"><option value="All">All</option></select></div><button class="btn bs bsm" id="rNFBtn">Reset</button></div><div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Date</th><th>Notes</th><th>Edit</th></tr></thead><tbody id="nB"></tbody></table></div><div class="empty" id="nE"><div class="ei">📓</div>No notes.</div></div>
+<!-- Daily Notes (REDESIGNED) -->
+<div class="tc" id="t-nts">
+<div class="fb">
+  <div class="ff"><label>Domain</label><select id="nD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div>
+  <div class="ff"><label>Project</label><select id="nP"><option value="All">All</option></select></div>
+  <div class="ff"><label>RAG</label><select id="nR"><option value="All">All</option><option>Red</option><option>Amber</option><option>Green</option></select></div>
+  <div class="ff"><label>From</label><input type="date" id="nFrom" style="min-width:110px"></div>
+  <div class="ff"><label>To</label><input type="date" id="nTo" style="min-width:110px"></div>
+  <button class="btn bs bsm" id="rNFBtn">Reset</button>
+  <div class="dn-view-toggle">
+    <button class="vt-btn active" id="vtCards">📇 Cards</button>
+    <button class="vt-btn" id="vtList">📋 List</button>
+  </div>
+</div>
+<div id="nCards"></div>
+<div id="nList" style="display:none"><div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Date</th><th>Notes</th><th>Edit</th></tr></thead><tbody id="nB"></tbody></table></div></div>
+<div class="empty" id="nE"><div class="ei">📓</div>No notes.</div>
+</div>
 
+<!-- RAG -->
 <div class="tc" id="t-rag"><div class="fb"><div class="ff"><label>Domain</label><select id="rD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>RAG</label><select id="rR"><option value="All">All</option><option>Red</option><option>Amber</option><option>Green</option></select></div><button class="btn bs bsm" id="rRFBtn">Reset</button></div><div class="tw"><table class="pt"><thead><tr><th>Task</th><th>Domain</th><th>Status</th><th>RAG</th><th>KO</th><th>Planned</th></tr></thead><tbody id="rB"></tbody></table></div><div class="empty" id="rE"><div class="ei">🚦</div>No projects.</div><div class="cr"><div class="cb"><h3>RAG Dist</h3><canvas id="cRa"></canvas></div><div class="cb"><h3>RAG × Domain</h3><canvas id="cRD"></canvas></div></div></div>
 
+<!-- Timeline -->
 <div class="tc" id="t-tl"><div class="fb"><div class="ff"><label>Domain</label><select id="tD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>Status</label><select id="tS"><option value="All">All</option><option>Projected</option><option>WIP</option><option>On Hold</option><option>Submitted for Review</option><option>Fixes in Process</option><option>Approved by Dell</option><option>Scorm Published</option></select></div><div class="ff"><label>RAG</label><select id="tR"><option value="All">All</option><option>Red</option><option>Amber</option><option>Green</option></select></div><button class="btn bs bsm" id="rTFBtn">Reset</button></div><div class="tlw" id="tlW"><div class="empty"><div class="ei">📅</div>Add projects with dates.</div></div></div>
 
+<!-- Efforts -->
 <div class="tc" id="t-eff"><div class="fb"><div class="ff"><label>Domain</label><select id="eD"><option value="All">All</option><option>Client</option><option>NSI</option></select></div><div class="ff"><label>User</label><select id="eU"><option value="All">All</option></select></div><button class="btn bs bsm" id="rEFBtn">Reset</button></div><h3 style="font-size:11px;color:#0D2155;margin-bottom:8px">Log Effort</h3><div class="ef"><div class="fi"><label>User <span class="rq">*</span></label><input type="text" id="eUs" placeholder="Name"></div><div class="fi"><label>Domain <span class="rq">*</span></label><select id="eDm"><option value="">…</option><option>Client</option><option>NSI</option></select></div><div class="fi"><label>Task <span class="rq">*</span></label><select id="eTk"><option value="">…</option></select></div><div class="fi"><label>Date</label><input type="date" id="eDt"></div><div class="fi"><label>Hrs</label><input type="number" id="eHr" min="0" max="24" step="0.5" placeholder="0"></div><div style="align-self:end"><button class="btn bp bsm" id="addEBtn">Log</button></div></div><div class="tw"><table class="pt"><thead><tr><th>User</th><th>Domain</th><th>Task</th><th>Date</th><th>Hrs</th><th></th></tr></thead><tbody id="eB"></tbody></table></div><div class="empty" id="eE"><div class="ei">⏱️</div>No efforts.</div><div class="cr"><div class="cb"><h3>By User</h3><canvas id="cEU"></canvas></div><div class="cb"><h3>By Task</h3><canvas id="cET"></canvas></div></div></div>
 
 </div>
@@ -318,6 +351,7 @@
 (function(){
 const P=[],EF=[],CL=[];
 let fH=null,syncTmr=null,cd=0,cdTmr=null,mCh=null,syncN=0,syncInt=15,loadedFileName='';
+let dnView='cards'; // 'cards' or 'list'
 const ch={};
 const SL=['Projected','WIP','On Hold','Submitted for Review','Fixes in Process','Approved by Dell','Scorm Published'];
 const SCC=['#C5D4E3','#0672CB','#e67e22','#66278F','#c0392b','#0B7C84','#0D2155'];
@@ -335,159 +369,26 @@ function tdy(){return new Date().toISOString().slice(0,10)}
 function lg(m){CL.push({time:new Date().toLocaleTimeString(),msg:m})}
 G('tdL').textContent=tdy();G('eDt').value=tdy();
 
-// ==================== SYNC ENGINE ====================
-function buildWB(){
-  const wb=XLSX.utils.book_new();
-  function pR(l){return l.map(p=>({"Task Name":p.name,Type:p.type,Status:p.status,RAG:p.rag,"KO Date":p.ko||'',"Planned Completion":p.planned||'',"Actual Completion":p.actual||'',Skills:p.skills.join(', '),"Synthesia Path":p.files?.synthesia||'',"Storyline Path":p.files?.storyline||'',"Guides Path":p.files?.guides||'',"Scorms Path":p.files?.scorms||'',"Rise Path":p.files?.rise||'',"Others Path":p.files?.others||'',Scope:p.scope||'',Notes:(p.notes||[]).map(n=>n.date+': '+n.text).join(' | ')}))}
-  const cRows=pR(P.filter(p=>p.domain==='Client'));
-  const nRows=pR(P.filter(p=>p.domain==='NSI'));
-  const eRows=EF.map(e=>({User:e.user,Domain:e.domain,Task:e.taskName,Date:e.date,Hours:e.hours}));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(cRows.length?cRows:[{}]),'Client');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(nRows.length?nRows:[{}]),'NSI');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(eRows.length?eRows:[{}]),'Efforts');
-  return wb;
-}
+// ===== SYNC ENGINE (UNCHANGED) =====
+function buildWB(){const wb=XLSX.utils.book_new();function pR(l){return l.map(p=>({"Task Name":p.name,Type:p.type,Status:p.status,RAG:p.rag,"KO Date":p.ko||'',"Planned Completion":p.planned||'',"Actual Completion":p.actual||'',Skills:p.skills.join(', '),"Synthesia Path":p.files?.synthesia||'',"Storyline Path":p.files?.storyline||'',"Guides Path":p.files?.guides||'',"Scorms Path":p.files?.scorms||'',"Rise Path":p.files?.rise||'',"Others Path":p.files?.others||'',Scope:p.scope||'',Notes:(p.notes||[]).map(n=>n.date+': '+n.text).join(' | ')}))}const cR=pR(P.filter(p=>p.domain==='Client'));const nR=pR(P.filter(p=>p.domain==='NSI'));const eR=EF.map(e=>({User:e.user,Domain:e.domain,Task:e.taskName,Date:e.date,Hours:e.hours}));XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(cR.length?cR:[{}]),'Client');XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(nR.length?nR:[{}]),'NSI');XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(eR.length?eR:[{}]),'Efforts');return wb}
+async function writeToFile(){if(!fH)return false;try{const wb=buildWB();const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});const bl=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const wr=await fH.createWritable();await wr.write(bl);await wr.close();console.log('[SYNC] ✅',fH.name,new Date().toLocaleTimeString());return true}catch(e){console.error('[SYNC] ❌',e);return false}}
+async function doSync(){if(!fH)return;syncN++;const now=new Date().toLocaleTimeString();const ok=await writeToFile();if(ok){G('sSt').textContent='✅ Written';G('sLast').textContent='Last: '+now+' (#'+syncN+')';toast('🔄 Synced → '+loadedFileName+' at '+now,2)}else{G('sSt').textContent='⚠️ Failed';toast('⚠️ Sync failed',3)}}
+async function syncNow(){if(!fH){toast('⚠️ No file.',3);return}syncN++;cd=syncInt;const ok=await writeToFile();if(ok){const now=new Date().toLocaleTimeString();G('sSt').textContent='✅ Synced';G('sLast').textContent='Last: '+now+' (#'+syncN+')';toast('⚡ Synced!',2)}else toast('⚠️ Failed',3)}
+function startSync(){if(syncTmr)clearInterval(syncTmr);if(cdTmr)clearInterval(cdTmr);cd=syncInt;if(fH){G('sI').className='si on';G('sS').textContent='Live ('+syncInt+'s)';G('sModeB').className='smode active';G('sModeB').textContent='● Live '+syncInt+'s';G('sFn').textContent=loadedFileName;G('hdrFile').textContent=loadedFileName}else{G('sI').className='si off';G('sS').textContent='No file';G('sModeB').className='smode inactive';G('sModeB').textContent='Off';G('sFn').textContent='Not connected';G('hdrFile').textContent='No file'}G('tmr').textContent='⏱ '+cd+'s';cdTmr=setInterval(()=>{cd--;if(cd<0)cd=syncInt;G('tmr').textContent='⏱ '+cd+'s'},1000);syncTmr=setInterval(()=>{doSync();cd=syncInt},syncInt*1000)}
 
-async function writeToFile(){
-  if(!fH){console.log('[SYNC] No file handle');return false}
-  try{
-    const wb=buildWB();
-    const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-    const blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const writable=await fH.createWritable();
-    await writable.write(blob);
-    await writable.close();
-    console.log('[SYNC] ✅ Written to',fH.name,'at',new Date().toLocaleTimeString(),'size:',blob.size);
-    return true;
-  }catch(e){
-    console.error('[SYNC] ❌ Write failed:',e);
-    return false;
-  }
-}
+// ===== INIT (UNCHANGED) =====
+G('fileArea').addEventListener('click',async function(){const stm=G('initSt');if(!window.showOpenFilePicker){stm.className='stm err';stm.textContent='⚠️ Use Chrome or Edge.';return}try{const[handle]=await window.showOpenFilePicker({types:[{description:'Excel',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx','.xls']}}],multiple:false});const perm=await handle.requestPermission({mode:'readwrite'});if(perm!=='granted'){stm.className='stm err';stm.textContent='⚠️ Permission denied.';return}fH=handle;const file=await fH.getFile();loadedFileName=file.name;G('fileArea').classList.add('has-file');G('faIcon').textContent='✅';G('faText').style.display='none';G('fileName').style.display='block';G('fileName').textContent=file.name;G('fileSize').style.display='block';G('fileSize').textContent=(file.size/1024).toFixed(1)+' KB';G('faChange').style.display='block';G('okBtn').disabled=false;G('okBtn').style.opacity='1';stm.className='stm ok';stm.textContent='✅ Ready! Click OK.'}catch(e){if(e.name!=='AbortError'){stm.className='stm err';stm.textContent='⚠️ '+e.message}}});
+G('okBtn').addEventListener('click',async function(){if(!fH)return;const stm=G('initSt');stm.className='stm info';stm.textContent='Reading…';syncInt=parseInt(G('syncInterval').value)||15;try{const file=await fH.getFile();const buf=await file.arrayBuffer();parseXL(buf);stm.className='stm ok';stm.textContent='✅ Loaded '+P.length+' projects! Testing write…';const ok=await writeToFile();if(ok){stm.innerHTML='✅ Connected to <b>'+loadedFileName+'</b> every '+syncInt+'s!'}else{fH=null;stm.className='stm err';stm.textContent='⚠️ Write failed.'}setTimeout(()=>{G('initD').style.display='none';G('mainB').style.display='block';startSync()},1000)}catch(err){stm.className='stm err';stm.textContent='⚠️ '+err.message}});
+G('skipBtn').addEventListener('click',function(){syncInt=parseInt(G('syncInterval').value)||15;G('initD').style.display='none';G('mainB').style.display='block';startSync()});
+G('tmplBtn').addEventListener('click',function(){const wb=XLSX.utils.book_new();const h=["Task Name","Type","Status","RAG","KO Date","Planned Completion","Actual Completion","Skills","Synthesia Path","Storyline Path","Guides Path","Scorms Path","Rise Path","Others Path","Scope","Notes"];XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h]),'Client');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h]),'NSI');XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["User","Domain","Task","Date","Hours"]]),'Efforts');XLSX.writeFile(wb,'Dell_Portfolio_Template.xlsx');toast('📄 Template!')});
+async function reloadFile(){if(!fH){toast('⚠️ No handle.',3);return}try{const file=await fH.getFile();const buf=await file.arrayBuffer();parseXL(buf);toast('🔄 Reloaded '+P.length)}catch(e){toast('⚠️ '+e.message,3)}}
 
-async function doSync(){
-  if(!fH)return;
-  syncN++;const now=new Date().toLocaleTimeString();
-  const ok=await writeToFile();
-  if(ok){G('sSt').textContent='✅ Written';G('sLast').textContent='Last: '+now+' (#'+syncN+')';toast('🔄 Synced → '+loadedFileName+' at '+now,2)}
-  else{G('sSt').textContent='⚠️ Failed';toast('⚠️ Sync failed — check console',3)}
-}
+// ===== DATA PARSING (UNCHANGED) =====
+function parseXL(buf){const wb=XLSX.read(buf,{type:'array'});P.length=0;EF.length=0;function loadSh(ws,dom){XLSX.utils.sheet_to_json(ws).forEach(r=>{if(!r['Task Name'])return;const notes=[];if(r['Notes']){r['Notes'].split(' | ').forEach(n=>{const i=n.indexOf(': ');if(i>-1)notes.push({date:n.slice(0,i),text:n.slice(i+2)});else notes.push({date:tdy(),text:n})})}P.push({id:Date.now()+Math.random()*1e4|0,domain:dom,type:r['Type']||'Custom',name:r['Task Name'],status:r['Status']||'Projected',rag:r['RAG']||'Green',ko:r['KO Date']||'',planned:r['Planned Completion']||'',actual:r['Actual Completion']||'',skills:(r['Skills']||'').split(',').map(s=>s.trim()).filter(Boolean),files:{synthesia:r['Synthesia Path']||'',storyline:r['Storyline Path']||'',guides:r['Guides Path']||'',scorms:r['Scorms Path']||'',rise:r['Rise Path']||'',others:r['Others Path']||''},scope:r['Scope']||'',notes})})}if(wb.SheetNames.includes('Client'))loadSh(wb.Sheets['Client'],'Client');if(wb.SheetNames.includes('NSI'))loadSh(wb.Sheets['NSI'],'NSI');if(wb.SheetNames.includes('Efforts')){XLSX.utils.sheet_to_json(wb.Sheets['Efforts']).forEach(r=>{if(!r['User'])return;EF.push({id:Date.now()+Math.random()*1e4|0,user:r['User']||'',domain:r['Domain']||'',taskId:0,taskName:r['Task']||'',date:r['Date']||'',hours:parseFloat(r['Hours'])||0})})}lg('Loaded '+P.length);updKPI();updNPF();updEUF();const at=qs('.tb.active',G('app'));if(at)rTab(at.dataset.t)}
 
-async function syncNow(){
-  if(!fH){toast('⚠️ No file. Load first.',3);return}
-  syncN++;cd=syncInt;
-  const ok=await writeToFile();
-  if(ok){const now=new Date().toLocaleTimeString();G('sSt').textContent='✅ Synced';G('sLast').textContent='Last: '+now+' (#'+syncN+')';toast('⚡ Synced!',2)}
-  else toast('⚠️ Failed',3);
-}
-
-function startSync(){
-  if(syncTmr){clearInterval(syncTmr)}if(cdTmr){clearInterval(cdTmr)}
-  cd=syncInt;
-  if(fH){G('sI').className='si on';G('sS').textContent='Live ('+syncInt+'s)';G('sModeB').className='smode active';G('sModeB').textContent='● Live '+syncInt+'s';G('sFn').textContent=loadedFileName;G('hdrFile').textContent=loadedFileName}
-  else{G('sI').className='si off';G('sS').textContent='No file';G('sModeB').className='smode inactive';G('sModeB').textContent='Off';G('sFn').textContent='Not connected';G('hdrFile').textContent='No file'}
-  G('tmr').textContent='⏱ '+cd+'s';
-  cdTmr=setInterval(()=>{cd--;if(cd<0)cd=syncInt;G('tmr').textContent='⏱ '+cd+'s'},1000);
-  syncTmr=setInterval(()=>{doSync();cd=syncInt},syncInt*1000);
-}
-
-// ==================== INIT ====================
-// Browse uses showOpenFilePicker with readwrite mode
-G('fileArea').addEventListener('click',async function(){
-  const stm=G('initSt');
-  if(!window.showOpenFilePicker){
-    stm.className='stm err';
-    stm.textContent='⚠️ Your browser does not support the File System Access API. Please use Chrome or Edge.';
-    return;
-  }
-  try{
-    const [handle]=await window.showOpenFilePicker({
-      types:[{description:'Excel Files',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx','.xls']}}],
-      multiple:false
-    });
-    // Request readwrite permission
-    const perm=await handle.requestPermission({mode:'readwrite'});
-    if(perm!=='granted'){
-      stm.className='stm err';stm.textContent='⚠️ Write permission denied. Live-sync will not work.';
-      return;
-    }
-    fH=handle;
-    const file=await fH.getFile();
-    loadedFileName=file.name;
-    G('fileArea').classList.add('has-file');
-    G('faIcon').textContent='✅';
-    G('faText').style.display='none';
-    G('fileName').style.display='block';G('fileName').textContent=file.name;
-    G('fileSize').style.display='block';G('fileSize').textContent=(file.size/1024).toFixed(1)+' KB';
-    G('faChange').style.display='block';
-    G('okBtn').disabled=false;G('okBtn').style.opacity='1';
-    stm.className='stm ok';stm.textContent='✅ File selected with read-write permission! Click OK to load.';
-    console.log('[INIT] File handle acquired:',file.name,'permission:',perm);
-  }catch(e){
-    if(e.name!=='AbortError'){stm.className='stm err';stm.textContent='⚠️ '+e.message}
-  }
-});
-
-G('okBtn').addEventListener('click',async function(){
-  if(!fH){toast('Browse a file first.',3);return}
-  const stm=G('initSt');stm.className='stm info';stm.textContent='Reading file…';
-  syncInt=parseInt(G('syncInterval').value)||15;
-  try{
-    const file=await fH.getFile();
-    const buf=await file.arrayBuffer();
-    parseXL(buf);
-    stm.className='stm ok';stm.textContent='✅ Loaded '+P.length+' projects! Testing write…';
-    // Test write
-    const ok=await writeToFile();
-    if(ok){
-      stm.innerHTML='✅ Live-sync confirmed! Writing to <b>'+loadedFileName+'</b> every '+syncInt+'s.';
-      console.log('[INIT] Test write succeeded');
-    }else{
-      stm.className='stm err';stm.textContent='⚠️ Test write failed. Check if file is open in Excel.';
-      fH=null;
-    }
-    setTimeout(()=>{G('initD').style.display='none';G('mainB').style.display='block';startSync()},1000);
-  }catch(err){stm.className='stm err';stm.textContent='⚠️ '+err.message}
-});
-
-G('skipBtn').addEventListener('click',function(){
-  syncInt=parseInt(G('syncInterval').value)||15;
-  G('initD').style.display='none';G('mainB').style.display='block';startSync();
-});
-
-G('tmplBtn').addEventListener('click',function(){
-  const wb=XLSX.utils.book_new();
-  const h=["Task Name","Type","Status","RAG","KO Date","Planned Completion","Actual Completion","Skills","Synthesia Path","Storyline Path","Guides Path","Scorms Path","Rise Path","Others Path","Scope","Notes"];
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h]),'Client');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([h]),'NSI');
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["User","Domain","Task","Date","Hours"]]),'Efforts');
-  XLSX.writeFile(wb,'Dell_Portfolio_Template.xlsx');toast('📄 Template downloaded!');
-});
-
-async function reloadFile(){
-  if(!fH){toast('⚠️ No handle.',3);return}
-  try{const file=await fH.getFile();const buf=await file.arrayBuffer();parseXL(buf);toast('🔄 Reloaded '+P.length+' projects')}
-  catch(e){toast('⚠️ '+e.message,3)}
-}
-
-// ==================== DATA ====================
-function parseXL(buf){
-  const wb=XLSX.read(buf,{type:'array'});P.length=0;EF.length=0;
-  function loadSh(ws,dom){XLSX.utils.sheet_to_json(ws).forEach(r=>{
-    if(!r['Task Name'])return;
-    const notes=[];if(r['Notes']){r['Notes'].split(' | ').forEach(n=>{const i=n.indexOf(': ');if(i>-1)notes.push({date:n.slice(0,i),text:n.slice(i+2)});else notes.push({date:tdy(),text:n})})}
-    P.push({id:Date.now()+Math.random()*1e4|0,domain:dom,type:r['Type']||'Custom',name:r['Task Name'],status:r['Status']||'Projected',rag:r['RAG']||'Green',ko:r['KO Date']||'',planned:r['Planned Completion']||'',actual:r['Actual Completion']||'',skills:(r['Skills']||'').split(',').map(s=>s.trim()).filter(Boolean),files:{synthesia:r['Synthesia Path']||'',storyline:r['Storyline Path']||'',guides:r['Guides Path']||'',scorms:r['Scorms Path']||'',rise:r['Rise Path']||'',others:r['Others Path']||''},scope:r['Scope']||'',notes})})}
-  if(wb.SheetNames.includes('Client'))loadSh(wb.Sheets['Client'],'Client');
-  if(wb.SheetNames.includes('NSI'))loadSh(wb.Sheets['NSI'],'NSI');
-  if(wb.SheetNames.includes('Efforts')){XLSX.utils.sheet_to_json(wb.Sheets['Efforts']).forEach(r=>{if(!r['User'])return;EF.push({id:Date.now()+Math.random()*1e4|0,user:r['User']||'',domain:r['Domain']||'',taskId:0,taskName:r['Task']||'',date:r['Date']||'',hours:parseFloat(r['Hours'])||0})})}
-  lg('Loaded '+P.length+' projects');updKPI();updNPF();updEUF();const at=qs('.tb.active',G('app'));if(at)rTab(at.dataset.t);
-}
-
-// ==================== TABS ====================
+// ===== TABS =====
 const tabDef=[['add','+ Add'],['prj','Projects'],['scp','Scope'],['nts','Daily Notes'],['rag','RAG'],['tl','Timeline'],['eff','Efforts']];
-const tabBar=G('tabBar');
-tabDef.forEach(([k,label],i)=>{const b=document.createElement('button');b.className='tb'+(i===0?' active':'');b.dataset.t=k;b.textContent=label;tabBar.appendChild(b);
-b.addEventListener('click',()=>{qsa('.tb',G('app')).forEach(x=>x.classList.remove('active'));qsa('.tc',G('app')).forEach(x=>x.classList.remove('active'));b.classList.add('active');G('t-'+k).classList.add('active');rTab(k)})});
+const tabBar=G('tabBar');tabDef.forEach(([k,label],i)=>{const b=document.createElement('button');b.className='tb'+(i===0?' active':'');b.dataset.t=k;b.textContent=label;tabBar.appendChild(b);b.addEventListener('click',()=>{qsa('.tb',G('app')).forEach(x=>x.classList.remove('active'));qsa('.tc',G('app')).forEach(x=>x.classList.remove('active'));b.classList.add('active');G('t-'+k).classList.add('active');rTab(k)})});
 function rTab(t){if(t==='prj'){rTbl();rCh()}if(t==='scp')rScp();if(t==='nts')rNts();if(t==='rag'){rRAG();rRAGCh()}if(t==='tl')rTL();if(t==='eff'){rEff();rECh()}}
 
 // Form
@@ -497,15 +398,11 @@ G('clrFBtn').addEventListener('click',clrF);
 G('pF').addEventListener('submit',function(e){e.preventDefault();const dm=G('fDo').value,ty=G('fTy').value,nm=G('fNa').value.trim(),st=G('fSt').value;const rg=qs('input[name="fRG"]:checked',G('app')).value;if(!dm||!ty||!nm||!st){toast('⚠️ Fill required fields.');return}const nt=G('fNo').value.trim();const p={id:Date.now(),domain:dm,type:ty,name:nm,status:st,rag:rg,ko:G('fKO').value,planned:G('fPl').value,actual:G('fAc').value,skills:gChk('fSk'),files:{synthesia:G('fpSy').value.trim(),storyline:G('fpSt').value.trim(),guides:G('fpPa').value.trim(),scorms:G('fpSc').value.trim(),rise:G('fpRi').value.trim(),others:G('fpOt').value.trim()},scope:G('fSc2').value.trim(),notes:[]};if(nt)p.notes.push({date:tdy(),text:nt});P.push(p);lg('Added: '+nm);clrF();updKPI();updNPF();toast('✅ "'+nm+'" added!')});
 function updKPI(){G('kT').textContent=P.length;G('kW').textContent=P.filter(p=>p.status==='WIP').length;G('kG').textContent=P.filter(p=>p.rag==='Green').length;G('kA').textContent=P.filter(p=>p.rag==='Amber').length;G('kR').textContent=P.filter(p=>p.rag==='Red').length;G('hT').textContent=P.length}
 
-// KPI modals
+// KPI modals (UNCHANGED)
 function showM(ty){if(!P.length){toast('No data.');return}G('mBg').classList.add('show');if(mCh){mCh.destroy();mCh=null}const ctx=G('mC').getContext('2d');if(ty==='total'){G('mTi').textContent='By Type';const d={Custom:0,New:0,Maintenance:0};P.forEach(p=>d[p.type]=(d[p.type]||0)+1);mCh=new Chart(ctx,{type:'doughnut',data:{labels:Object.keys(d),datasets:[{data:Object.values(d),backgroundColor:['#0672CB','#0B7C84','#66278F']}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:12},boxWidth:10}}}}})}else if(ty==='status'){G('mTi').textContent='Status';const d=SL.map(s=>P.filter(p=>p.status===s).length);mCh=new Chart(ctx,{type:'bar',data:{labels:SL.map(s=>s.length>14?s.slice(0,12)+'…':s),datasets:[{data:d,backgroundColor:SCC}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{family:'Arial',size:11},stepSize:1}},y:{ticks:{font:{family:'Arial',size:11}}}}}})}else if(ty==='rag'){G('mTi').textContent='RAG';const d={Red:0,Amber:0,Green:0};P.forEach(p=>d[p.rag]++);mCh=new Chart(ctx,{type:'doughnut',data:{labels:Object.keys(d),datasets:[{data:Object.values(d),backgroundColor:[RC.Red,RC.Amber,RC.Green]}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:12},boxWidth:10}}}}})}}
 G('closeMBtn').addEventListener('click',()=>{G('mBg').classList.remove('show');if(mCh){mCh.destroy();mCh=null}});
 G('mBg').addEventListener('click',e=>{if(e.target===G('mBg')){G('mBg').classList.remove('show');if(mCh){mCh.destroy();mCh=null}}});
-G('kpiTotal').addEventListener('click',()=>showM('total'));
-G('kpiWip').addEventListener('click',()=>showM('status'));
-G('kpiGreen').addEventListener('click',()=>showM('rag'));
-G('kpiAmber').addEventListener('click',()=>showM('rag'));
-G('kpiRed').addEventListener('click',()=>showM('rag'));
+G('kpiTotal').addEventListener('click',()=>showM('total'));G('kpiWip').addEventListener('click',()=>showM('status'));G('kpiGreen').addEventListener('click',()=>showM('rag'));G('kpiAmber').addEventListener('click',()=>showM('rag'));G('kpiRed').addEventListener('click',()=>showM('rag'));
 
 // Filters
 function fl(f){let l=[...P];if(f.dom&&f.dom!=='All')l=l.filter(p=>p.domain===f.dom);if(f.stat&&f.stat!=='All')l=l.filter(p=>p.status===f.stat);if(f.rag&&f.rag!=='All')l=l.filter(p=>p.rag===f.rag);if(f.typ&&f.typ!=='All')l=l.filter(p=>p.type===f.typ);return l}
@@ -513,104 +410,172 @@ function pf(){return{dom:G('pD').value,stat:G('pS').value,rag:G('pR').value,typ:
 G('rPFBtn').addEventListener('click',()=>{G('pD').value=G('pS').value=G('pR').value=G('pTy').value='All';rTbl();rCh()});
 ['pD','pS','pR','pTy'].forEach(id=>G(id).addEventListener('change',()=>{rTbl();rCh()}));
 
-function rTbl(){const list=fl(pf());const tb=G('pB');tb.innerHTML='';if(!list.length){G('pE').style.display='block';return}G('pE').style.display='none';list.forEach(p=>{const nh=(p.notes||[]).map(n=>'<div><b>'+n.date+':</b> '+esc(n.text)+'</div>').join('')||'—';const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td>'+esc(p.type)+'</td><td><span class="sp '+sCl(p.status)+'">'+esc(p.status)+'</span></td><td><span class="rb '+p.rag.toLowerCase()+'"></span>'+esc(p.rag)+'</td><td>'+fDt(p.ko)+'</td><td>'+fDt(p.planned)+'</td><td class="tdsk">'+(p.skills.length?p.skills.join(', '):'—')+'</td><td class="tds">'+(esc(p.scope)||'—')+'</td><td class="tdn">'+nh+'</td><td><button class="edtb" data-id="'+p.id+'" data-ctx="full">✎ Edit</button> <button class="dbt" data-id="'+p.id+'">✕</button></td>';tb.appendChild(tr)})}
+// ===== PROJECTS TABLE (CHANGED: show only latest note) =====
+function rTbl(){const list=fl(pf());const tb=G('pB');tb.innerHTML='';if(!list.length){G('pE').style.display='block';return}G('pE').style.display='none';list.forEach(p=>{
+  const notes=p.notes||[];
+  const sorted=[...notes].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const latest=sorted[0];
+  let noteCell='<span style="color:#B6B6B6;font-size:9px">No notes</span>';
+  if(latest){
+    noteCell='<div style="font-size:9px"><b>'+fDt(latest.date)+':</b> '+esc(latest.text.length>80?latest.text.slice(0,80)+'…':latest.text)+'</div>';
+    if(notes.length>1)noteCell+='<span class="note-badge">'+notes.length+' total</span>';
+  }
+  const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td>'+esc(p.type)+'</td><td><span class="sp '+sCl(p.status)+'">'+esc(p.status)+'</span></td><td><span class="rb '+p.rag.toLowerCase()+'"></span>'+esc(p.rag)+'</td><td>'+fDt(p.ko)+'</td><td>'+fDt(p.planned)+'</td><td class="tdsk">'+(p.skills.length?p.skills.join(', '):'—')+'</td><td class="tds">'+(esc(p.scope)||'—')+'</td><td class="tdn">'+noteCell+'</td><td><button class="edtb" data-id="'+p.id+'" data-ctx="full">✎ Edit</button> <button class="dbt" data-id="'+p.id+'">✕</button></td>';tb.appendChild(tr)})}
 G('pB').addEventListener('click',function(e){const db=e.target.closest('.dbt');if(db){const id=+db.dataset.id,ix=P.findIndex(p=>p.id===id);if(ix>-1&&confirm('Delete "'+P[ix].name+'"?')){lg('Deleted: '+P[ix].name);P.splice(ix,1);updKPI();rTbl();rCh();toast('🗑️')}return}const ed=e.target.closest('.edtb');if(ed)openEd(+ed.dataset.id,ed.dataset.ctx,ed.dataset.ni)});
 
+// Charts (UNCHANGED)
 function dc(k){if(ch[k]){ch[k].destroy();delete ch[k]}}
 function rCh(){const l=fl(pf());dc('ty');const td={Custom:0,New:0,Maintenance:0};l.forEach(p=>td[p.type]=(td[p.type]||0)+1);ch.ty=new Chart(G('cTy').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(td),datasets:[{data:Object.values(td),backgroundColor:['#0672CB','#0B7C84','#66278F']}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:11},boxWidth:10}}}}});dc('sk');const sd=SK.map(s=>l.filter(p=>p.skills.includes(s)).length);ch.sk=new Chart(G('cSk').getContext('2d'),{type:'radar',data:{labels:SK,datasets:[{label:'Projects',data:sd,backgroundColor:'rgba(6,114,203,.18)',borderColor:'#0672CB',pointBackgroundColor:'#0672CB',pointRadius:3,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:true,scales:{r:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Arial',size:9},backdropColor:'transparent'},grid:{color:'#C5D4E3'},pointLabels:{font:{family:'Arial',size:9},color:'#1D2C3B'}}},plugins:{legend:{display:false}}}});dc('do');const dd={Client:0,NSI:0};l.forEach(p=>dd[p.domain]=(dd[p.domain]||0)+1);ch.do=new Chart(G('cDo').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(dd),datasets:[{data:Object.values(dd),backgroundColor:['#00468B','#0B7C84']}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:11},boxWidth:10}}}}});dc('st');const stD=SL.map(s=>l.filter(p=>p.status===s).length);ch.st=new Chart(G('cSt').getContext('2d'),{type:'bar',data:{labels:SL.map(s=>s.length>12?s.slice(0,10)+'…':s),datasets:[{data:stD,backgroundColor:SCC}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{family:'Arial',size:10},stepSize:1}},y:{ticks:{font:{family:'Arial',size:10}}}}}})}
 
-// Scope
+// Scope (UNCHANGED)
 function rScp(){const f={dom:G('sD').value,typ:G('sTy').value,stat:'All',rag:'All'};const l=fl(f);const tb=G('sB');tb.innerHTML='';if(!l.length){G('sE').style.display='block';return}G('sE').style.display='none';l.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td>'+esc(p.type)+'</td><td><span class="sp '+sCl(p.status)+'">'+esc(p.status)+'</span></td><td class="tds">'+(esc(p.scope)||'—')+'</td><td><button class="edtb" data-id="'+p.id+'" data-ctx="scope">✎</button></td>';tb.appendChild(tr)})}
-['sD','sTy'].forEach(id=>G(id).addEventListener('change',rScp));
-G('rSFBtn').addEventListener('click',()=>{G('sD').value=G('sTy').value='All';rScp()});
+['sD','sTy'].forEach(id=>G(id).addEventListener('change',rScp));G('rSFBtn').addEventListener('click',()=>{G('sD').value=G('sTy').value='All';rScp()});
 G('sB').addEventListener('click',e=>{const ed=e.target.closest('.edtb');if(ed)openEd(+ed.dataset.id,ed.dataset.ctx)});
 
-// Notes
+// ===== DAILY NOTES (REDESIGNED) =====
 function updNPF(){const s=G('nP');const c=s.value;s.innerHTML='<option value="All">All</option>';P.forEach(p=>{s.innerHTML+='<option value="'+p.id+'">'+esc(p.name)+'</option>'});s.value=c}
-function rNts(){updNPF();const dom=G('nD').value,pid=G('nP').value;let l=[...P];if(dom!=='All')l=l.filter(p=>p.domain===dom);if(pid!=='All')l=l.filter(p=>p.id===+pid);const tb=G('nB');tb.innerHTML='';let has=false;l.forEach(p=>{(p.notes||[]).forEach((n,ni)=>{has=true;const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td>'+fDt(n.date)+'</td><td class="tdn" style="white-space:pre-wrap">'+esc(n.text)+'</td><td><button class="edtb" data-id="'+p.id+'" data-ni="'+ni+'" data-ctx="note">✎</button></td>';tb.appendChild(tr)})});G('nE').style.display=has?'none':'block'}
-['nD','nP'].forEach(id=>G(id).addEventListener('change',rNts));
-G('rNFBtn').addEventListener('click',()=>{G('nD').value='All';G('nP').value='All';rNts()});
-G('nB').addEventListener('click',e=>{const ed=e.target.closest('.edtb');if(ed)openEd(+ed.dataset.id,ed.dataset.ctx,ed.dataset.ni)});
 
-// RAG
+// View toggle
+G('vtCards').addEventListener('click',()=>{dnView='cards';G('vtCards').classList.add('active');G('vtList').classList.remove('active');rNts()});
+G('vtList').addEventListener('click',()=>{dnView='list';G('vtList').classList.add('active');G('vtCards').classList.remove('active');rNts()});
+
+function getFilteredNotesProjects(){
+  const dom=G('nD').value,pid=G('nP').value,rag=G('nR').value,from=G('nFrom').value,to=G('nTo').value;
+  let list=[...P];
+  if(dom!=='All')list=list.filter(p=>p.domain===dom);
+  if(pid!=='All')list=list.filter(p=>p.id===+pid);
+  if(rag!=='All')list=list.filter(p=>p.rag===rag);
+  // Filter projects that have notes, and filter notes by date range
+  return list.map(p=>{
+    let notes=[...(p.notes||[])];
+    if(from)notes=notes.filter(n=>n.date>=from);
+    if(to)notes=notes.filter(n=>n.date<=to);
+    return{...p,notes};
+  }).filter(p=>p.notes.length>0);
+}
+
+function rNts(){
+  updNPF();
+  const projects=getFilteredNotesProjects();
+  const hasNotes=projects.length>0;
+  G('nE').style.display=hasNotes?'none':'block';
+
+  if(dnView==='cards'){
+    G('nCards').style.display='';G('nList').style.display='none';
+    renderNotesCards(projects);
+  }else{
+    G('nCards').style.display='none';G('nList').style.display='';
+    renderNotesList(projects);
+  }
+}
+
+function renderNotesCards(projects){
+  const container=G('nCards');container.innerHTML='';
+  if(!projects.length)return;
+  const html=projects.map(p=>{
+    const sorted=[...p.notes].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const ragColor=RC[p.rag]||'#0672CB';
+    const entriesHtml=sorted.map((n,ni)=>{
+      return '<div class="dn-entry"><div class="dn-dot"></div><div class="dn-date">'+fDt(n.date)+'</div><div class="dn-text">'+esc(n.text)+'</div><div class="dn-edit"><button class="edtb" data-id="'+p.id+'" data-ni="'+ni+'" data-ctx="note" style="font-size:8px;padding:1px 5px">✎</button></div></div>';
+    }).join('');
+    return '<div class="dn-card"><div class="dn-card-header"><span class="rb '+p.rag.toLowerCase()+'"></span><span class="dn-proj-name">'+esc(p.name)+'</span><span class="dn-proj-meta">'+esc(p.domain)+' · <span class="sp '+sCl(p.status)+'" style="font-size:8px">'+esc(p.status)+'</span></span><span class="dn-count">'+p.notes.length+' note'+(p.notes.length>1?'s':'')+'</span></div><div class="dn-card-body"><div class="dn-timeline">'+entriesHtml+'</div></div></div>';
+  }).join('');
+  container.innerHTML='<div class="dn-cards">'+html+'</div>';
+  // Attach edit handlers
+  container.querySelectorAll('.edtb').forEach(btn=>{
+    btn.addEventListener('click',()=>openEd(+btn.dataset.id,btn.dataset.ctx,btn.dataset.ni));
+  });
+}
+
+function renderNotesList(projects){
+  const tb=G('nB');tb.innerHTML='';
+  if(!projects.length)return;
+  projects.forEach(p=>{
+    const sorted=[...p.notes].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    sorted.forEach((n,ni)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td>'+fDt(n.date)+'</td><td class="tdn" style="white-space:pre-wrap">'+esc(n.text)+'</td><td><button class="edtb" data-id="'+p.id+'" data-ni="'+ni+'" data-ctx="note">✎</button></td>';
+      tb.appendChild(tr);
+    });
+  });
+  // Attach handlers
+  tb.querySelectorAll('.edtb').forEach(btn=>{
+    btn.addEventListener('click',()=>openEd(+btn.dataset.id,btn.dataset.ctx,btn.dataset.ni));
+  });
+}
+
+['nD','nP','nR','nFrom','nTo'].forEach(id=>G(id).addEventListener('change',rNts));
+G('rNFBtn').addEventListener('click',()=>{G('nD').value='All';G('nP').value='All';G('nR').value='All';G('nFrom').value='';G('nTo').value='';rNts()});
+
+// RAG (UNCHANGED)
 function rRAG(){const f={dom:G('rD').value,rag:G('rR').value,stat:'All',typ:'All'};const l=fl(f);const tb=G('rB');tb.innerHTML='';if(!l.length){G('rE').style.display='block';return}G('rE').style.display='none';l.forEach(p=>{const tr=document.createElement('tr');tr.innerHTML='<td style="font-weight:600">'+esc(p.name)+'</td><td>'+esc(p.domain)+'</td><td><span class="sp '+sCl(p.status)+'">'+esc(p.status)+'</span></td><td><span class="rb '+p.rag.toLowerCase()+'"></span>'+esc(p.rag)+'</td><td>'+fDt(p.ko)+'</td><td>'+fDt(p.planned)+'</td>';tb.appendChild(tr)})}
 function rRAGCh(){const f={dom:G('rD').value,rag:G('rR').value,stat:'All',typ:'All'};const l=fl(f);dc('ra');const rd={Red:0,Amber:0,Green:0};l.forEach(p=>rd[p.rag]++);ch.ra=new Chart(G('cRa').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(rd),datasets:[{data:Object.values(rd),backgroundColor:[RC.Red,RC.Amber,RC.Green]}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:11},boxWidth:10}}}}});dc('rD2');const bd={Client:{Red:0,Amber:0,Green:0},NSI:{Red:0,Amber:0,Green:0}};l.forEach(p=>{if(bd[p.domain])bd[p.domain][p.rag]++});ch.rD2=new Chart(G('cRD').getContext('2d'),{type:'bar',data:{labels:['Client','NSI'],datasets:[{label:'Red',data:[bd.Client.Red,bd.NSI.Red],backgroundColor:RC.Red},{label:'Amber',data:[bd.Client.Amber,bd.NSI.Amber],backgroundColor:RC.Amber},{label:'Green',data:[bd.Client.Green,bd.NSI.Green],backgroundColor:RC.Green}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{font:{family:'Arial',size:10},boxWidth:10}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{stepSize:1}}}}})}
-['rD','rR'].forEach(id=>G(id).addEventListener('change',()=>{rRAG();rRAGCh()}));
-G('rRFBtn').addEventListener('click',()=>{G('rD').value=G('rR').value='All';rRAG();rRAGCh()});
+['rD','rR'].forEach(id=>G(id).addEventListener('change',()=>{rRAG();rRAGCh()}));G('rRFBtn').addEventListener('click',()=>{G('rD').value=G('rR').value='All';rRAG();rRAGCh()});
 
-// Timeline
+// Timeline (UNCHANGED)
 function rTL(){const f={dom:G('tD').value,stat:G('tS').value,rag:G('tR').value,typ:'All'};const l=fl(f).filter(p=>p.ko||p.planned);const w=G('tlW');if(!l.length){w.innerHTML='<div class="empty"><div class="ei">📅</div>No dated projects.</div>';return}let ad=[];l.forEach(p=>{if(p.ko)ad.push(new Date(p.ko+'T00:00:00'));if(p.planned)ad.push(new Date(p.planned+'T00:00:00'));if(p.actual)ad.push(new Date(p.actual+'T00:00:00'))});const td=new Date();td.setHours(0,0,0,0);ad.push(td);const mn=new Date(Math.min(...ad)),mx=new Date(Math.max(...ad));mn.setDate(1);mx.setMonth(mx.getMonth()+1);mx.setDate(0);const tt=mx-mn;if(tt<=0)return;let mo=[],cu=new Date(mn);while(cu<=mx){const m=cu.toLocaleDateString('en-US',{month:'short',year:'2-digit'});const s=new Date(cu);cu.setMonth(cu.getMonth()+1);const e=new Date(Math.min(cu-1,mx));mo.push({label:m,width:((e-s)/tt)*100})}const bc={Red:'#c0392b',Amber:'#e67e22',Green:'#0B7C84'};let h='<div style="position:relative"><div class="tlmh"><div class="tlms"></div><div class="tlmm">';mo.forEach(m=>{h+='<div class="tlmo" style="width:'+m.width+'%">'+m.label+'</div>'});h+='</div></div>';l.forEach(p=>{const s=p.ko?new Date(p.ko+'T00:00:00'):new Date(p.planned+'T00:00:00');const e=p.actual?new Date(p.actual+'T00:00:00'):(p.planned?new Date(p.planned+'T00:00:00'):s);const lp=Math.max(0,((s-mn)/tt)*100),wd=Math.max(.5,((e-s)/tt)*100);h+='<div class="tlr"><div class="tll" title="'+esc(p.name)+'">'+esc(p.name)+'</div><div class="tlba"><div class="tlbar" style="left:'+lp+'%;width:'+wd+'%;background:'+(bc[p.rag]||'#0672CB')+'">'+esc(p.status)+'</div></div></div>'});const tl=((td-mn)/tt)*100;if(tl>=0&&tl<=100){h+='<div style="position:absolute;top:0;bottom:0;left:160px;right:0;pointer-events:none"><div style="position:absolute;left:'+tl+'%;top:0;bottom:0;width:2px;background:#c0392b;z-index:10"></div><div style="position:absolute;left:'+tl+'%;top:0;transform:translateX(-50%);font-size:8px;font-weight:700;color:#c0392b;z-index:11">▼ Today</div></div>'}h+='</div>';w.innerHTML=h}
-['tD','tS','tR'].forEach(id=>G(id).addEventListener('change',rTL));
-G('rTFBtn').addEventListener('click',()=>{G('tD').value=G('tS').value=G('tR').value='All';rTL()});
+['tD','tS','tR'].forEach(id=>G(id).addEventListener('change',rTL));G('rTFBtn').addEventListener('click',()=>{G('tD').value=G('tS').value=G('tR').value='All';rTL()});
 
-// Efforts
+// Efforts (UNCHANGED)
 G('eDm').addEventListener('change',function(){const d=this.value;const s=G('eTk');s.innerHTML='<option value="">…</option>';P.filter(p=>!d||p.domain===d).forEach(p=>{s.innerHTML+='<option value="'+p.id+'">'+esc(p.name)+'</option>'})});
 G('addEBtn').addEventListener('click',function(){const u=G('eUs').value.trim(),d=G('eDm').value,t=G('eTk').value,dt=G('eDt').value,h=parseFloat(G('eHr').value);if(!u||!d||!t||!dt||isNaN(h)||h<=0){toast('⚠️ Fill all.');return}const pr=P.find(p=>p.id===+t);EF.push({id:Date.now(),user:u,domain:d,taskId:+t,taskName:pr?pr.name:'?',date:dt,hours:h});lg('Effort: '+u+' '+h+'h');G('eUs').value='';G('eHr').value='';rEff();rECh();updEUF();toast('✅ '+h+'h logged!')});
 function gEFF(){let l=[...EF];const d=G('eD').value,u=G('eU').value;if(d!=='All')l=l.filter(e=>e.domain===d);if(u!=='All')l=l.filter(e=>e.user===u);return l}
 function rEff(){const l=gEFF();const tb=G('eB');tb.innerHTML='';if(!l.length){G('eE').style.display='block';return}G('eE').style.display='none';l.forEach(e=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+esc(e.user)+'</td><td>'+esc(e.domain)+'</td><td>'+esc(e.taskName)+'</td><td>'+fDt(e.date)+'</td><td style="font-weight:700">'+e.hours+'h</td><td><button class="dbt" data-eid="'+e.id+'">✕</button></td>';tb.appendChild(tr)})}
 G('eB').addEventListener('click',function(e){const db=e.target.closest('.dbt');if(db){const id=+db.dataset.eid;const ix=EF.findIndex(e=>e.id===id);if(ix>-1){EF.splice(ix,1);rEff();rECh();toast('🗑️')}}});
 function updEUF(){const s=G('eU');const c=s.value;const u=[...new Set(EF.map(e=>e.user))];s.innerHTML='<option value="All">All</option>';u.forEach(x=>{s.innerHTML+='<option>'+esc(x)+'</option>'});s.value=c}
-['eD','eU'].forEach(id=>G(id).addEventListener('change',()=>{rEff();rECh()}));
-G('rEFBtn').addEventListener('click',()=>{G('eD').value=G('eU').value='All';rEff();rECh()});
+['eD','eU'].forEach(id=>G(id).addEventListener('change',()=>{rEff();rECh()}));G('rEFBtn').addEventListener('click',()=>{G('eD').value=G('eU').value='All';rEff();rECh()});
 function rECh(){const l=gEFF();dc('eu');const bu={};l.forEach(e=>{bu[e.user]=(bu[e.user]||0)+e.hours});ch.eu=new Chart(G('cEU').getContext('2d'),{type:'bar',data:{labels:Object.keys(bu),datasets:[{data:Object.values(bu),backgroundColor:CC}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{font:{family:'Arial',size:10}}},x:{ticks:{font:{family:'Arial',size:10}}}}}});dc('et');const bt={};l.forEach(e=>{bt[e.taskName]=(bt[e.taskName]||0)+e.hours});ch.et=new Chart(G('cET').getContext('2d'),{type:'bar',data:{labels:Object.keys(bt).map(x=>x.length>16?x.slice(0,14)+'…':x),datasets:[{data:Object.values(bt),backgroundColor:CC.slice(2)}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{family:'Arial',size:10}}},y:{ticks:{font:{family:'Arial',size:10}}}}}})}
 
-// Edit
+// ===== EDIT MODAL (CHANGED: notes section shows count header, all notes preserved) =====
 function openEd(id,ctx,ni){
   const p=P.find(x=>x.id===id);if(!p)return;const box=G('eBox');G('eBg').classList.add('show');
   if(ctx==='full'){
     const skC=SK.map(s=>'<label><input type="checkbox" value="'+s+'" '+(p.skills.includes(s)?'checked':'')+'><span>'+s+'</span></label>').join('');
-    const ntH=(p.notes||[]).map((n,i)=>'<div style="display:flex;gap:5px;align-items:start;margin-bottom:5px"><input type="date" class="en-d" value="'+n.date+'" style="width:120px;font-size:10px;padding:4px"><textarea class="en-t" rows="2" style="flex:1;font-size:10px;padding:4px">'+esc(n.text)+'</textarea><button class="dbt" onclick="this.parentElement.remove()">✕</button></div>').join('');
-    box.innerHTML='<button class="cl" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">✕</button><h2>Edit: '+esc(p.name)+'</h2><div class="fg"><div class="sh">Identity</div><div class="fi"><label>Domain</label><select id="eDo">'+['Client','NSI'].map(d=>'<option '+(p.domain===d?'selected':'')+'>'+d+'</option>').join('')+'</select></div><div class="fi"><label>Type</label><select id="eTyE">'+['Custom','New','Maintenance'].map(t=>'<option '+(p.type===t?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="fi fw"><label>Name</label><input type="text" id="eNaE" value="'+esc(p.name)+'"></div><div class="sh">Timeline</div><div class="fi"><label>KO</label><input type="date" id="eKOE" value="'+(p.ko||'')+'"></div><div class="fi"><label>Planned</label><input type="date" id="ePlE" value="'+(p.planned||'')+'"></div><div class="fi"><label>Actual</label><input type="date" id="eAcE" value="'+(p.actual||'')+'"></div><div class="fi"><label>Status</label><select id="eStE">'+SL.map(s=>'<option '+(p.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="sh">Health</div><div class="fi fw"><div class="rg" id="eRgE"><label class="rr"><input type="radio" name="eRG" value="Red" '+(p.rag==='Red'?'checked':'')+'><span class="rd"></span>Red</label><label class="ra"><input type="radio" name="eRG" value="Amber" '+(p.rag==='Amber'?'checked':'')+'><span class="rd"></span>Amber</label><label class="rgr"><input type="radio" name="eRG" value="Green" '+(p.rag==='Green'?'checked':'')+'><span class="rd"></span>Green</label></div></div><div class="sh">Skills</div><div class="fi fw"><div class="cg" id="eSkE">'+skC+'</div></div><div class="sh">Files</div><div class="fpg"><div class="fpi"><span class="fpl">Synthesia</span><input type="text" id="eFpSy" value="'+esc(p.files?.synthesia||'')+'"></div><div class="fpi"><span class="fpl">Storyline</span><input type="text" id="eFpSt" value="'+esc(p.files?.storyline||'')+'"></div><div class="fpi"><span class="fpl">Guides</span><input type="text" id="eFpPa" value="'+esc(p.files?.guides||'')+'"></div><div class="fpi"><span class="fpl">Scorms</span><input type="text" id="eFpSc" value="'+esc(p.files?.scorms||'')+'"></div><div class="fpi"><span class="fpl">Rise</span><input type="text" id="eFpRi" value="'+esc(p.files?.rise||'')+'"></div><div class="fpi"><span class="fpl">Others</span><input type="text" id="eFpOt" value="'+esc(p.files?.others||'')+'"></div></div><div class="sh">Scope</div><div class="fi fw"><textarea id="eScE" rows="3">'+esc(p.scope)+'</textarea></div><div class="sh">Notes</div><div class="fi fw"><div id="eNL">'+ntH+'</div><button class="btn bs bsm" style="margin-top:4px" onclick="(function(){var l=document.getElementById(\'eNL\');var d=document.createElement(\'div\');d.style.cssText=\'display:flex;gap:5px;align-items:start;margin-bottom:5px\';d.innerHTML=\'<input type=date class=en-d value='+tdy()+' style=width:120px;font-size:10px;padding:4px><textarea class=en-t rows=2 style=flex:1;font-size:10px;padding:4px placeholder=Note…></textarea><button class=dbt onclick=this.parentElement.remove()>✕</button>\';l.appendChild(d)})()">+ Note</button></div><div class="brr"><button class="btn bs" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="saveEdBtn">Save</button></div></div>';
+    // Sort notes newest first for display in edit
+    const sortedNotes=[...(p.notes||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const ntH=sortedNotes.map((n,i)=>'<div style="display:flex;gap:5px;align-items:start;margin-bottom:5px;padding:6px;background:'+(i===0?'#e6f5f5':'#f9fbfd')+';border-radius:6px;border:1px solid '+(i===0?'#0B7C84':'#C5D4E3')+'"><input type="date" class="en-d" value="'+n.date+'" style="width:120px;font-size:10px;padding:4px"><textarea class="en-t" rows="2" style="flex:1;font-size:10px;padding:4px">'+esc(n.text)+'</textarea><button class="dbt" onclick="this.parentElement.remove()">✕</button></div>').join('');
+    const noteCountLabel='<div style="font-size:10px;color:#40586D;margin-bottom:6px"><b>'+sortedNotes.length+'</b> note'+(sortedNotes.length!==1?'s':'')+' — newest first. All notes are preserved.</div>';
+    box.innerHTML='<button class="cl" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">✕</button><h2>Edit: '+esc(p.name)+'</h2><div class="fg"><div class="sh">Identity</div><div class="fi"><label>Domain</label><select id="eDo">'+['Client','NSI'].map(d=>'<option '+(p.domain===d?'selected':'')+'>'+d+'</option>').join('')+'</select></div><div class="fi"><label>Type</label><select id="eTyE">'+['Custom','New','Maintenance'].map(t=>'<option '+(p.type===t?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="fi fw"><label>Name</label><input type="text" id="eNaE" value="'+esc(p.name)+'"></div><div class="sh">Timeline</div><div class="fi"><label>KO</label><input type="date" id="eKOE" value="'+(p.ko||'')+'"></div><div class="fi"><label>Planned</label><input type="date" id="ePlE" value="'+(p.planned||'')+'"></div><div class="fi"><label>Actual</label><input type="date" id="eAcE" value="'+(p.actual||'')+'"></div><div class="fi"><label>Status</label><select id="eStE">'+SL.map(s=>'<option '+(p.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="sh">Health</div><div class="fi fw"><div class="rg" id="eRgE"><label class="rr"><input type="radio" name="eRG" value="Red" '+(p.rag==='Red'?'checked':'')+'><span class="rd"></span>Red</label><label class="ra"><input type="radio" name="eRG" value="Amber" '+(p.rag==='Amber'?'checked':'')+'><span class="rd"></span>Amber</label><label class="rgr"><input type="radio" name="eRG" value="Green" '+(p.rag==='Green'?'checked':'')+'><span class="rd"></span>Green</label></div></div><div class="sh">Skills</div><div class="fi fw"><div class="cg" id="eSkE">'+skC+'</div></div><div class="sh">Files</div><div class="fpg"><div class="fpi"><span class="fpl">Synthesia</span><input type="text" id="eFpSy" value="'+esc(p.files?.synthesia||'')+'"></div><div class="fpi"><span class="fpl">Storyline</span><input type="text" id="eFpSt" value="'+esc(p.files?.storyline||'')+'"></div><div class="fpi"><span class="fpl">Guides</span><input type="text" id="eFpPa" value="'+esc(p.files?.guides||'')+'"></div><div class="fpi"><span class="fpl">Scorms</span><input type="text" id="eFpSc" value="'+esc(p.files?.scorms||'')+'"></div><div class="fpi"><span class="fpl">Rise</span><input type="text" id="eFpRi" value="'+esc(p.files?.rise||'')+'"></div><div class="fpi"><span class="fpl">Others</span><input type="text" id="eFpOt" value="'+esc(p.files?.others||'')+'"></div></div><div class="sh">Scope</div><div class="fi fw"><textarea id="eScE" rows="3">'+esc(p.scope)+'</textarea></div><div class="sh">Daily Notes ('+sortedNotes.length+' entries)</div><div class="fi fw">'+noteCountLabel+'<div id="eNL">'+ntH+'</div><button class="btn bs bsm" style="margin-top:6px" id="addNRBtn">+ Add New Note (today)</button></div><div class="brr"><button class="btn bs" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="saveEdBtn">Save</button></div></div>';
+    G('addNRBtn').addEventListener('click',function(){const l=G('eNL');const d=document.createElement('div');d.style.cssText='display:flex;gap:5px;align-items:start;margin-bottom:5px;padding:6px;background:#fff8e1;border-radius:6px;border:1px solid #e67e22';d.innerHTML='<input type="date" class="en-d" value="'+tdy()+'" style="width:120px;font-size:10px;padding:4px"><textarea class="en-t" rows="2" style="flex:1;font-size:10px;padding:4px" placeholder="New note…"></textarea><button class="dbt" onclick="this.parentElement.remove()">✕</button>';l.insertBefore(d,l.firstChild)});
     G('saveEdBtn').addEventListener('click',()=>saveEd(id,'full'));
   }else if(ctx==='scope'){
     box.innerHTML='<button class="cl" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">✕</button><h2>Scope: '+esc(p.name)+'</h2><div class="fg"><div class="fi fw"><textarea id="eScE" rows="5">'+esc(p.scope)+'</textarea></div><div class="brr"><button class="btn bs" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="saveEdBtn">Save</button></div></div>';
     G('saveEdBtn').addEventListener('click',()=>saveEd(id,'scope'));
   }else if(ctx==='note'){
-    const note=(p.notes||[])[+ni]||{date:tdy(),text:''};
-    box.innerHTML='<button class="cl" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">✕</button><h2>Note: '+esc(p.name)+'</h2><div class="fg"><div class="fi"><label>Date</label><input type="date" id="eNDt" value="'+(note.date||tdy())+'"></div><div class="fi fw"><textarea id="eNTx" rows="4">'+esc(note.text)+'</textarea></div><div class="brr"><button class="btn bs" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="saveEdBtn">Save</button></div></div>';
-    G('saveEdBtn').addEventListener('click',()=>saveEd(id,'note',ni));
+    // Find the actual note by original index in p.notes
+    const sortedNotes=[...(p.notes||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    const note=sortedNotes[+ni]||{date:tdy(),text:''};
+    // Find original index
+    const origIdx=(p.notes||[]).indexOf(note);
+    box.innerHTML='<button class="cl" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">✕</button><h2>Edit Note: '+esc(p.name)+'</h2><div class="fg"><div class="fi"><label>Date</label><input type="date" id="eNDt" value="'+(note.date||tdy())+'"></div><div class="fi fw"><textarea id="eNTx" rows="4">'+esc(note.text)+'</textarea></div><div class="brr"><button class="btn bs" onclick="document.getElementById(\'eBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="saveEdBtn">Save</button></div></div>';
+    G('saveEdBtn').addEventListener('click',()=>saveEd(id,'note',origIdx>=0?origIdx:+ni));
   }
 }
 G('eBg').addEventListener('click',e=>{if(e.target===G('eBg'))G('eBg').classList.remove('show')});
 
 function saveEd(id,ctx,ni){
   const p=P.find(x=>x.id===id);if(!p)return;
-  if(ctx==='full'){p.domain=G('eDo').value;p.type=G('eTyE').value;p.name=G('eNaE').value.trim();p.status=G('eStE').value;const rg=qs('input[name="eRG"]:checked',G('eRgE'));p.rag=rg?rg.value:p.rag;p.ko=G('eKOE').value;p.planned=G('ePlE').value;p.actual=G('eAcE').value;p.skills=Array.from(qsa('input[type="checkbox"]:checked',G('eSkE'))).map(c=>c.value);p.files={synthesia:G('eFpSy').value.trim(),storyline:G('eFpSt').value.trim(),guides:G('eFpPa').value.trim(),scorms:G('eFpSc').value.trim(),rise:G('eFpRi').value.trim(),others:G('eFpOt').value.trim()};p.scope=G('eScE').value.trim();const nDs=qsa('.en-d',G('eNL')),nTs=qsa('.en-t',G('eNL'));p.notes=[];nDs.forEach((nd,i)=>{const t=nTs[i]?nTs[i].value.trim():'';if(t)p.notes.push({date:nd.value||tdy(),text:t})});lg('Edited: '+p.name)}
+  if(ctx==='full'){p.domain=G('eDo').value;p.type=G('eTyE').value;p.name=G('eNaE').value.trim();p.status=G('eStE').value;const rg=qs('input[name="eRG"]:checked',G('eRgE'));p.rag=rg?rg.value:p.rag;p.ko=G('eKOE').value;p.planned=G('ePlE').value;p.actual=G('eAcE').value;p.skills=Array.from(qsa('input[type="checkbox"]:checked',G('eSkE'))).map(c=>c.value);p.files={synthesia:G('eFpSy').value.trim(),storyline:G('eFpSt').value.trim(),guides:G('eFpPa').value.trim(),scorms:G('eFpSc').value.trim(),rise:G('eFpRi').value.trim(),others:G('eFpOt').value.trim()};p.scope=G('eScE').value.trim();
+  // Collect all notes from edit form — preserves everything
+  const nDs=qsa('.en-d',G('eNL')),nTs=qsa('.en-t',G('eNL'));p.notes=[];nDs.forEach((nd,i)=>{const t=nTs[i]?nTs[i].value.trim():'';if(t)p.notes.push({date:nd.value||tdy(),text:t})});
+  lg('Edited: '+p.name)}
   else if(ctx==='scope'){p.scope=G('eScE').value.trim();lg('Scope: '+p.name)}
   else if(ctx==='note'){if(!p.notes)p.notes=[];if(p.notes[ni]){p.notes[ni].date=G('eNDt').value;p.notes[ni].text=G('eNTx').value.trim()}lg('Note: '+p.name)}
   G('eBg').classList.remove('show');updKPI();updNPF();const at=qs('.tb.active',G('app'));if(at)rTab(at.dataset.t);toast('✅ Saved!');
 }
 
-// Export
+// Export (UNCHANGED)
 function expXL(){const wb=buildWB();XLSX.writeFile(wb,loadedFileName||'Dell_Portfolio.xlsx');toast('📥 Exported')}
 function expPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('l','mm','a4');doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(13,33,85);doc.text('Dell Portfolio Report',14,18);doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(new Date().toLocaleString(),14,25);doc.autoTable({startY:32,head:[['Task','Domain','Type','Status','RAG','KO','Planned']],body:P.map(p=>[p.name,p.domain,p.type,p.status,p.rag,p.ko||'—',p.planned||'—']),styles:{font:'helvetica',fontSize:9},headStyles:{fillColor:[6,114,203]}});doc.save('Dell_Portfolio.pdf');toast('📄 PDF')}
 
-// Header buttons
-G('syncNowBtn').addEventListener('click',syncNow);
-G('syncNowBtn2').addEventListener('click',syncNow);
-G('expXLBtn').addEventListener('click',expXL);
-G('expPDFBtn').addEventListener('click',expPDF);
-G('reloadBtn').addEventListener('click',reloadFile);
+// Header buttons (UNCHANGED)
+G('syncNowBtn').addEventListener('click',syncNow);G('syncNowBtn2').addEventListener('click',syncNow);G('expXLBtn').addEventListener('click',expXL);G('expPDFBtn').addEventListener('click',expPDF);G('reloadBtn').addEventListener('click',reloadFile);
 
-// Exit
-G('exitBtn').addEventListener('click',async function(){
-  const box=G('xBox');let c='';
-  if(!CL.length)c='<div style="color:#40586D;font-style:italic">No changes.</div>';
-  else c=CL.map(x=>'<div class="ci"><b>'+x.time+'</b> — '+esc(x.msg)+'</div>').join('');
-  box.innerHTML='<button class="cl" onclick="document.getElementById(\'xBg\').classList.remove(\'show\')">✕</button><h2>Exit Dashboard</h2><p style="font-size:11px;color:#40586D">Changes ('+CL.length+'):</p><div class="chl">'+c+'</div>'+(fH?'<p style="font-size:11px;color:#0B7C84;font-weight:700">✅ Final sync → '+loadedFileName+'</p>':'<p style="font-size:11px;color:#e67e22">⚠️ No handle — will download.</p>')+'<div class="brow"><button class="btn bs" onclick="document.getElementById(\'xBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="confXBtn">Save &amp; Exit</button></div>';
-  G('xBg').classList.add('show');
-  G('confXBtn').addEventListener('click',async function(){
-    if(fH){const ok=await writeToFile();if(ok)toast('✅ Final sync!',2);else{expXL();toast('⚠️ Downloaded.',3)}}else expXL();
-    if(syncTmr)clearInterval(syncTmr);if(cdTmr)clearInterval(cdTmr);
-    G('xBg').classList.remove('show');G('mainB').style.display='none';G('initD').style.display='flex';
-    G('initBox').innerHTML='<h2 style="color:#0B7C84">✅ Saved</h2><p style="margin:12px 0;text-align:center;font-size:12px">'+(fH?'Written to: <b>'+loadedFileName+'</b>':'Downloaded')+'</p><p style="font-size:10px;color:#40586D;text-align:center">'+CL.length+' change(s).</p><div style="text-align:center;margin-top:16px"><button class="btn bp" onclick="location.reload()" style="font-size:13px;padding:10px 32px">Reopen</button></div>';
-  });
-});
+// Exit (UNCHANGED)
+G('exitBtn').addEventListener('click',async function(){const box=G('xBox');let c='';if(!CL.length)c='<div style="color:#40586D;font-style:italic">No changes.</div>';else c=CL.map(x=>'<div class="ci"><b>'+x.time+'</b> — '+esc(x.msg)+'</div>').join('');box.innerHTML='<button class="cl" onclick="document.getElementById(\'xBg\').classList.remove(\'show\')">✕</button><h2>Exit Dashboard</h2><p style="font-size:11px;color:#40586D">Changes ('+CL.length+'):</p><div class="chl">'+c+'</div>'+(fH?'<p style="font-size:11px;color:#0B7C84;font-weight:700">✅ Final sync → '+loadedFileName+'</p>':'<p style="font-size:11px;color:#e67e22">⚠️ No handle — will download.</p>')+'<div class="brow"><button class="btn bs" onclick="document.getElementById(\'xBg\').classList.remove(\'show\')">Cancel</button><button class="btn bp" id="confXBtn">Save &amp; Exit</button></div>';G('xBg').classList.add('show');G('confXBtn').addEventListener('click',async function(){if(fH){const ok=await writeToFile();if(ok)toast('✅ Final sync!',2);else{expXL();toast('⚠️ Downloaded.',3)}}else expXL();if(syncTmr)clearInterval(syncTmr);if(cdTmr)clearInterval(cdTmr);G('xBg').classList.remove('show');G('mainB').style.display='none';G('initD').style.display='flex';G('initBox').innerHTML='<h2 style="color:#0B7C84">✅ Saved</h2><p style="margin:12px 0;text-align:center;font-size:12px">'+(fH?'Written to: <b>'+loadedFileName+'</b>':'Downloaded')+'</p><p style="font-size:10px;color:#40586D;text-align:center">'+CL.length+' change(s).</p><div style="text-align:center;margin-top:16px"><button class="btn bp" onclick="location.reload()" style="font-size:13px;padding:10px 32px">Reopen</button></div>'})});
 G('xBg').addEventListener('click',e=>{if(e.target===G('xBg'))G('xBg').classList.remove('show')});
 
 updKPI();
-
-// Expose for inline onclick handlers that still exist
 window.APP={syncNow,reloadFile,expXL,expPDF};
 })();
 </script>
